@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -527,15 +528,18 @@ def test_update_ps1_exists_and_keeps_the_same_safety_contract() -> None:
 _PWSH = shutil.which("pwsh")
 
 
-@pytest.mark.skipif(_PWSH is None, reason="pwsh is not installed on this box")
+@pytest.mark.skipif(
+    sys.platform != "win32" or _PWSH is None,
+    reason="native Windows and pwsh are required for the robocopy lifecycle",
+)
 def test_update_ps1_end_to_end_overlay_preserve_backup_downgrade() -> None:
     """The .ps1 twin is destructive-overlay code that had ZERO executions
     anywhere (CI only AST-parses it; the bash twin gets ~25 real e2e tests) —
     its first real run used to be on a user's Windows box against their vault.
     This is the real lifecycle, mirroring the bash e2e: refuse a downgrade
     before any change, then overlay code, preserve every byte of user data,
-    and take the backup zip first. Runs on windows-latest in CI; pwsh-gated
-    (skips) elsewhere."""
+    and take the backup zip first. Runs on windows-latest in CI; skipped on
+    other platforms even when cross-platform PowerShell is installed."""
     import tempfile
 
     with tempfile.TemporaryDirectory() as tmp:
