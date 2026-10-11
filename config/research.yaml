@@ -1,0 +1,33 @@
+# config/research.yaml — OPTIONAL agent-research augmentation (CONVENTIONS §15a).
+#
+# This file controls ONLY the Sonar cross-check used as an adversarial input in
+# research-build's Phase 6.5 (Critique). It is a DIFFERENT slot from web search
+# (config/search.yaml, §15) and corroboration (§16): those take RAW results to
+# count independent domains; the cross-check asks Sonar-chat the same research
+# question and returns a synthesized SECOND OPINION + its citations.
+#
+# The cross-check is NOT fed into research-build's own synthesis — it is only an
+# input to the critique of that synthesis. So the collection pipeline (instruction
+# -stripping, verbatim-raw, dedup, claim traceability) is UNCHANGED whether the
+# cross-check runs or not.
+#
+# Gating — "if the key is set we run it, otherwise the pipeline runs exactly as
+# before": provider defaults to `sonar`, so merely setting PERPLEXITY_API_KEY in
+# config/.env activates it. A missing key (or provider: none) soft-skips.
+#
+# Secrets are NOT stored here — only the NAME of the env var (api_key_env).
+research:
+  cross_check:
+    # provider:
+    #   sonar -> ask the Perplexity Sonar chat API for an independent synthesis.
+    #            Active only when api_key_env is set in config/.env.
+    #   none  -> disable the cross-check entirely (soft-skip).
+    provider: sonar
+    sonar:
+      api_key_env: PERPLEXITY_API_KEY   # shared with §16; cross-check hits /chat/completions
+      model: sonar                      # sonar (default, cheapest) | sonar-pro | sonar-reasoning-pro
+      # The cross-check uses only the answer+citations and discards any reasoning,
+      # so plain `sonar` is the right fit (~8x cheaper output than reasoning-pro).
+      # NB: if you DO switch to a reasoning model, raise max_tokens to >=3000 — they
+      # spend most of the budget on hidden reasoning and a small cap returns empty.
+      max_tokens: 1024

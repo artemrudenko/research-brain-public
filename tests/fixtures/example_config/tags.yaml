@@ -1,0 +1,65 @@
+# config/tags.yaml — controlled tag vocabulary (the FIXED registry)
+#
+# MACHINE-OWNED FILE. Edited by the `setup-wizard` skill and by
+# `scripts/validate_brain.py` (normalize / merge synonyms / promote pending).
+# Do NOT hand-garden this file in the vault.
+#
+# The LLM (wiki-ingest) picks concept tags ONLY from here — closed-book.
+# Tag format is nested `domain/topic` (e.g. `ai/agents`). A bare `domain`
+# (e.g. `ai`) is also a valid tag and natively groups all its `ai/*` children
+# (Obsidian nested-tag behaviour — no separate super-tag feature).
+#
+# Rules (see docs/CONVENTIONS.md §11, §5.1):
+#   - 2–5 tags per concept, ≥1 domain-level tag.
+#   - If nothing here fits → propose ≤1 new `domain/topic` into `pending:`
+#     (quarantine) — NEVER write a new tag straight into `domains:`.
+#   - `synonyms:` maps an alias → its canonical `domain/topic` (RSS <category>
+#     normalization for collection + concept tagging both go through this map).
+#   - validate_brain.py promotes a `pending:` tag into `domains:` only after it
+#     recurs across ≥3 notes; one-off pending tags fold up to their domain.
+
+# ── domains: the allowed vocabulary ──────────────────────────────────────────
+# Each domain maps to its list of topics. The valid tags are the domain itself
+# plus every `domain/topic` pair built from this map.
+domains:
+  ai:
+    - agents        # autonomous / multi-agent systems, orchestration
+    - rag           # retrieval-augmented generation, vector search
+    - llm           # large language models, prompting, fine-tuning
+    - ml            # general machine learning, training, datasets
+    - research      # papers, benchmarks, new techniques
+    - governance    # AI policy, safety, regulation, ethics
+  tech:
+    - news          # general tech industry news, launches, company moves
+    - security      # vulnerabilities, breaches, infosec
+    - dev           # software engineering, tooling, languages
+    - product       # product launches and analyses
+  pkm:
+    - notes         # note-taking, atomic notes, linking
+    - workflow      # personal knowledge / research workflows
+
+# ── synonyms: alias → canonical `domain/topic` ───────────────────────────────
+# RSS <category> values and common variants normalize through this map.
+# Left side = what arrives in the wild; right side = the canonical registry tag.
+synonyms:
+  ai-ml: ai/ml
+  machine-learning: ai/ml
+  llms: ai/llm
+  large-language-models: ai/llm
+  agentic: ai/agents
+  multi-agent: ai/agents
+  retrieval-augmented-generation: ai/rag
+  ai-policy: ai/governance
+  ai-safety: ai/governance
+  tech-news: tech/news
+  infosec: tech/security
+  cybersecurity: tech/security
+  software-engineering: tech/dev
+  note-taking: pkm/notes
+  personal-knowledge-management: pkm/notes
+
+# ── pending: quarantine for proposed-but-unconfirmed tags ────────────────────
+# wiki-ingest appends ≤1 new `domain/topic` here when nothing in `domains:` fits.
+# A pending tag is NOT yet part of the live vocabulary — validate_brain.py
+# promotes it into `domains:` only after it recurs across ≥3 notes.
+pending: []

@@ -1,0 +1,68 @@
+# concepts.base — Obsidian Bases front door for the knowledge vault.
+#
+# WHAT THIS IS
+#   A live, auto-updating database view over the concept notes in brain/concepts/.
+#   Open it in Obsidian and browse — it stays current as notes are added, with zero
+#   gardening. This is the PRIMARY front door for non-technical users.
+#
+# REQUIREMENTS
+#   Obsidian >= 1.7 (Bases is a core feature from 1.7 onward). If your Obsidian is older
+#   or you are reading outside Obsidian (plain editor / Cowork / Claude Code), use the
+#   plain-markdown fallback: brain/INDEX.md (the curated MOC).
+#
+# SCOPE
+#   Sources only true concept notes (type == concept) and hides the seed/example notes
+#   that ship with the vault to demonstrate the format.
+
+# Global filter: only concept notes, excluding the seed/example demo notes.
+filters:
+  and:
+    - 'type == "concept"'
+    - 'file.inFolder("concepts")'
+    - not:
+        - file.hasTag("seed")
+        - file.hasTag("example")
+
+# Extract the top-level domain (the part before the first "/") from the first tag,
+# so cards can group by domain (e.g. "ai/agents" and "ai/rag" both group under "ai").
+# NOTE: grouping keys on tags[0] — the FIRST tag must be the concept's domain tag
+# (wiki-ingest emits it first); a non-domain first tag mis-groups the card.
+formulas:
+  domain: 'if(note.tags, note.tags[0].split("/")[0], "untagged")'
+
+# Friendly column headers.
+properties:
+  note.title:
+    displayName: Title
+  note.tags:
+    displayName: Tags
+  note.last_updated:
+    displayName: Updated
+  formula.domain:
+    displayName: Domain
+
+views:
+  # TABLE — flat list of every concept, newest-updated first.
+  - type: table
+    name: All concepts
+    order:
+      - note.title
+      - note.tags
+      - note.last_updated
+    sort:
+      - property: note.last_updated
+        direction: DESC
+
+  # CARDS — browse concepts grouped by top-level domain (zero-effort domain navigation).
+  - type: cards
+    name: By domain
+    groupBy:
+      property: formula.domain
+      direction: ASC
+    order:
+      - note.title
+      - note.tags
+      - note.last_updated
+    sort:
+      - property: note.title
+        direction: ASC

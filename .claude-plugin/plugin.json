@@ -1,0 +1,24 @@
+{
+  "name": "research-brain",
+  "version": "0.1.0",
+  "description": "A distributable, topic-agnostic knowledge and research pipeline for Cowork / Claude Code. Collects sources, distills them into an Obsidian knowledge base, builds digests, and delivers them to your channels.",
+  "author": {
+    "name": "research-brain contributors"
+  },
+  "license": "MIT",
+  "keywords": [
+    "research",
+    "knowledge-base",
+    "obsidian",
+    "digest",
+    "pipeline",
+    "second-brain"
+  ],
+  "skills": "./skills/",
+  "metadata": {
+    "compatibility": {
+      "claude_code": true,
+      "cowork": true
+    }
+  }
+}

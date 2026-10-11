@@ -1,0 +1,12 @@
+schema_version: 2
+# config/sources.yaml — collection sources by category (the ACTIVE config).
+# Machine-written by scripts/manage_sources.py / the setup-wizard: the VALUES are
+# yours to edit; comments and formatting are regenerated on every change.
+# Per-source keys: url (required) / type (rss|blog|medium-tag|webpage, default rss)
+#   / tier (high|medium|low — source credibility, default medium)
+#   / priority (high|medium|low — collection ordering, default medium)
+#   / filter (short note) / active (true|false, default true).
+# Category names stay in sync with config/topics.yaml (same name).
+# This is the ONLY config format (0.8.0+): legacy sources.md tables are
+# import-only via `python3 scripts/schema.py migrate-config`.
+categories: []

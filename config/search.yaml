@@ -1,0 +1,28 @@
+# config/search.yaml — Optional external web-search provider.
+#
+# The DEFAULT experience (Cowork / Claude Code) uses Claude's built-in WebSearch
+# tool inside the agent and needs NOTHING here. This file only matters for the
+# headless path (cron, no agent) and future fact-check corroboration.
+#
+# provider:
+#   claude-websearch  -> in-agent default; the agent calls its WebSearch tool.
+#                        Headless callers can't invoke it, so search.py returns a
+#                        sentinel note ("use the in-agent WebSearch tool").
+#   tavily            -> enable Tavily for headless / corroboration. Requires a
+#                        key in config/.env (TAVILY_API_KEY). See config/.env.example.
+#   perplexity        -> enable the Perplexity Search API (raw results) for headless
+#                        / corroboration. Requires PERPLEXITY_API_KEY in config/.env.
+#                        NB: the /search (raw-results) endpoint, NOT Sonar chat —
+#                        corroboration needs independent primary sources to count
+#                        domains, not a synthesized answer.
+#   none              -> no web search at all (soft-skip everywhere).
+#
+# Secrets are NOT stored here — only the NAME of the env var (api_key_env).
+search:
+  provider: claude-websearch
+  tavily:
+    api_key_env: TAVILY_API_KEY
+    max_results: 5
+  perplexity:
+    api_key_env: PERPLEXITY_API_KEY
+    max_results: 5

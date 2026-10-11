@@ -1,0 +1,56 @@
+# playbooks.base - Obsidian Bases front door for reusable methods.
+#
+# WHAT THIS IS
+#   A live, auto-updating database view over playbooks in brain/playbooks/.
+#   Playbooks capture repeatable procedures derived from concepts, lessons, and
+#   cited sources.
+#
+# REQUIREMENTS
+#   Obsidian >= 1.7 (Bases). Outside Obsidian, use brain/INDEX.md and search.
+
+filters:
+  and:
+    - 'type == "playbook"'
+    - 'file.inFolder("playbooks")'
+
+properties:
+  note.title:
+    displayName: Title
+  note.tags:
+    displayName: Tags
+  note.status:
+    displayName: Status
+  note.last_updated:
+    displayName: Updated
+  note.related_concept:
+    displayName: Related concepts
+  note.source_concepts:
+    displayName: Source concepts
+
+views:
+  - type: table
+    name: All playbooks
+    order:
+      - note.title
+      - note.status
+      - note.tags
+      - note.last_updated
+      - note.related_concept
+      - note.source_concepts
+    sort:
+      - property: note.last_updated
+        direction: DESC
+
+  - type: cards
+    name: By status
+    groupBy:
+      property: note.status
+      direction: ASC
+    order:
+      - note.title
+      - note.tags
+      - note.last_updated
+      - note.related_concept
+    sort:
+      - property: note.title
+        direction: ASC

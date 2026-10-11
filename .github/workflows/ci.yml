@@ -1,0 +1,126 @@
+name: CI
+
+# Quality gates for research-brain. ALL gates are BLOCKING: tests + coverage,
+# and ruff / mypy / bandit (the baseline was cleaned — the suite is lint-, type-
+# and security-clean). Dependencies are managed with uv: `uv sync` installs the
+# exact, locked set from pyproject.toml + uv.lock.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: tests + coverage (blocking)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install dependencies (locked)
+        run: uv sync --frozen --python ${{ matrix.python-version }}
+      - name: Run tests with coverage
+        run: uv run --frozen pytest --cov --cov-report=term-missing -ra
+
+  windows-smoke:
+    name: windows cross-platform primitives (smoke)
+    # ADR 0011 claims native Windows support via msvcrt.locking (registry.py) and
+    # an OpenProcess ctypes liveness probe (run_lock.py). The ubuntu jobs only
+    # mock-dispatch those win32 branches; this job runs them on a real Windows
+    # host so the claim is exercised, not just asserted. Kept deliberately narrow
+    # — just the cross-platform primitives, not the whole gate.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install dependencies (locked)
+        run: uv sync --frozen --python 3.12
+      - name: run-lock + registry tests (Windows code paths)
+        # Both modules import cleanly on Windows (no top-level fcntl) and their
+        # tests drive the real msvcrt flock backend + the OpenProcess pid probe.
+        run: uv run --frozen pytest tests/test_run_lock.py tests/test_registry.py -q
+      - name: run-lock acquire -> renew -> release smoke
+        # A real lifecycle through the JSON-lock CLI as three separate processes,
+        # mirroring the agent flow. Each step's exit code is checked explicitly:
+        # GitHub's pwsh wrapper only propagates the LAST line's status otherwise.
+        run: |
+          uv run --frozen python scripts/run_lock.py acquire --lock smoke.run.lock --token ci-smoke; if ($LASTEXITCODE -ne 0) { exit 1 }
+          uv run --frozen python scripts/run_lock.py renew   --lock smoke.run.lock --token ci-smoke; if ($LASTEXITCODE -ne 0) { exit 1 }
+          uv run --frozen python scripts/run_lock.py release --lock smoke.run.lock --token ci-smoke; if ($LASTEXITCODE -ne 0) { exit 1 }
+      - name: PowerShell installers parse cleanly (install.ps1 / update.ps1)
+        # The .ps1 ports are destructive-op code that POSIX boxes only
+        # substring-assert; this runs the real PowerShell AST parse (via the
+        # pwsh-gated pytest test) so a syntax error can never ship undetected.
+        run: uv run --frozen pytest "tests/test_update.py::test_powershell_scripts_parse_cleanly" -q
+      - name: update.ps1 real end-to-end (overlay, preserve, backup, downgrade refusal)
+        # A parse proves syntax, not behavior — this executes the actual
+        # destructive-overlay lifecycle on a fixture install, so update.ps1's
+        # first real run is never on a paying user's vault.
+        run: uv run --frozen pytest "tests/test_update.py::test_update_ps1_end_to_end_overlay_preserve_backup_downgrade" -q
+
+  mcp:
+    name: isolated MCP adapter (blocking)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install isolated adapter dependencies (locked)
+        run: uv sync --frozen --project integrations/mcp_server --python ${{ matrix.python-version }}
+      - name: Adapter tests and public stdio example
+        run: make mcp-test MCP_PYTHON=${{ matrix.python-version }}
+
+  lint:
+    name: ruff / mypy / bandit (blocking)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install tooling (locked)
+        run: uv sync --frozen
+      - name: ruff
+        run: uv run --frozen ruff check scripts tests tools integrations/mcp_server
+      - name: mypy
+        run: uv run --frozen mypy
+      - name: bandit
+        run: uv run --frozen bandit -r scripts tools -c pyproject.toml
+      - name: public repository contents
+        run: uv run --frozen python tools/export_public.py --check-in-place
+      - name: requirements exports match uv.lock
+        # The pip-fallback exports are generated from the lock; fail if they drifted
+        # (someone changed deps without `make export`). See Makefile `export` target.
+        run: |
+          make export
+          git diff --exit-code -- requirements.txt requirements-dev.txt
+      - name: frontmatter (SKILL.md)
+        run: uv run --frozen python scripts/frontmatter_lint.py --enforce
+      - name: validate config (channels/schedule/sources/topics/tags)
+        run: uv run --frozen python scripts/validate_config.py
+      - name: validate pipeline frontmatter (strict)
+        run: |
+          uv run --frozen python scripts/validate-pipeline-frontmatter.py pipeline/1-incoming --strict
+          uv run --frozen python scripts/validate-pipeline-frontmatter.py pipeline/2-curated --strict
+      - name: validate brain hygiene (advisory smoke)
+        run: uv run --frozen python scripts/validate_brain.py

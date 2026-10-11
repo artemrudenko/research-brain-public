@@ -1,0 +1,40 @@
+# Contributor-only files — stripped from the distribution archive built with `git archive`.
+# These describe how to develop/release research-brain, not how to run it; an end user's
+# agent must never read them as product contract. If you zip by hand, drop them manually too.
+#
+# ANCHOR EVERY DIRECTORY PATTERN with a leading `/`. A gitattributes pattern with no
+# slash-prefix matches at ANY depth, and the unanchored `tests/` used to strip all 18
+# `skills/*/tests/acceptance.md` files along with the root suite — while three files that
+# DO ship kept documenting them (docs/CONVENTIONS.md, wiki-ingest/research-build AGENTS.md).
+# Both directions are pinned by tests/test_dist.py.
+DEVELOPING.md      export-ignore
+RESUME.md          export-ignore
+.gitattributes     export-ignore
+/.github/          export-ignore
+/tests/            export-ignore
+# Dev tooling for the /tests/ tree above — dead weight without it.
+pytest.ini         export-ignore
+requirements-dev.txt export-ignore
+# Internal GSD planning state — useful to contributors, never part of the user product.
+/.planning/        export-ignore
+# Internal presentation decks — tracked for the team, not part of the product an end
+# user runs; keep them out of the shipped archive.
+/docs/decks/       export-ignore
+# Publication drafts and release working notes belong to the contributor checkout,
+# not the install archive users open as the product.
+/docs/publications/ export-ignore
+/docs/PUBLIC_RELEASE_PREP.md export-ignore
+/docs/product-audit-2026-07-05.md export-ignore
+/docs/private-history/ export-ignore
+/docs/BACKLOG.md export-ignore
+/docs/adr/0024-scholarly-author-ingestion.md export-ignore
+/tools/ export-ignore
+# Claude-Code/Cowork DEV-layer automations — a contributor's local dev loop, not product
+# contract: the settings.json hooks (auto-ruff + protected-path guard), the hand-written
+# security-gate-reviewer subagent, and the /release ritual skill. They reference dev-only
+# paths and tools (uv/ruff, make dist) and would only confuse an end
+# user's install, so keep them out of the shipped archive. (The six generated pipeline-role
+# agents under .claude/agents/ are product and DO ship — only the reviewer is excluded.)
+/.claude/settings.json                    export-ignore
+/.claude/agents/security-gate-reviewer.md export-ignore
+/skills/release/                          export-ignore

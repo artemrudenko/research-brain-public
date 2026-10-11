@@ -1,0 +1,56 @@
+# lessons.base - Obsidian Bases front door for lesson notes.
+#
+# WHAT THIS IS
+#   A live, auto-updating database view over atomic lesson notes in brain/lessons/.
+#   Lessons are small, sourced facts or watchlist items that have not yet become
+#   full concepts. Each lesson should link to a concept or parent playbook.
+#
+# REQUIREMENTS
+#   Obsidian >= 1.7 (Bases). Outside Obsidian, use brain/INDEX.md and search.
+
+filters:
+  and:
+    - 'type == "lesson"'
+    - 'file.inFolder("lessons")'
+
+properties:
+  note.title:
+    displayName: Title
+  note.tags:
+    displayName: Tags
+  note.extracted_at:
+    displayName: Extracted
+  note.confidence:
+    displayName: Confidence
+  note.related_concept:
+    displayName: Concept
+  note.parent_playbook:
+    displayName: Playbook
+
+views:
+  - type: table
+    name: All lessons
+    order:
+      - note.title
+      - note.tags
+      - note.confidence
+      - note.extracted_at
+      - note.related_concept
+      - note.parent_playbook
+    sort:
+      - property: note.extracted_at
+        direction: DESC
+
+  - type: cards
+    name: By confidence
+    groupBy:
+      property: note.confidence
+      direction: DESC
+    order:
+      - note.title
+      - note.tags
+      - note.related_concept
+      - note.parent_playbook
+    sort:
+      - property: note.title
+        direction: ASC

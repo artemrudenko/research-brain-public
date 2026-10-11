@@ -1,0 +1,170 @@
+# --- Editor / agent tooling (per-developer, never shipped) ---
+# Agent runtimes and third-party skill packs a contributor installs into their
+# own checkout. They are NOT product: they carry no research-brain behaviour, they
+# differ per developer and per assistant, and shipping them would hand an end user
+# an unrelated vendor's prompts. `.codex/` was listed alone while the sibling
+# runtimes rode in untracked — one omission, not a per-runtime decision.
+.codex/
+.agents/
+.qwen/
+.remember/
+.vscode/
+.idea/
+# Lockfile written by the third-party skill installer that populates the dirs above.
+skills-lock.json
+# Copilot's instruction surface, installed by the same class of tool.
+.github/copilot-instructions.md
+.github/instructions/
+
+# Private maintenance and publication working files. A public checkout starts
+# from the allowlisted source tree; these local copies stay out of new commits.
+.claude/settings.json
+.claude/agents/security-gate-reviewer.md
+/RESUME.md
+/docs/PUBLIC_RELEASE_PREP.md
+/docs/RELEASE_NOTES_*.md
+/docs/decks/
+/docs/private-history/
+/docs/BACKLOG.md
+/docs/adr/0024-scholarly-author-ingestion.md
+/.planning/
+/docs/product-audit-*.md
+/docs/publications/
+/skills/release/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Virtual environments
+.venv/
+.venv*/
+venv/
+env/
+
+# --- Distribution build output (`make dist`) ---
+dist/
+
+# --- Secrets ---
+# Real secrets live in .env; only .env.example is tracked.
+.env
+.env.*
+!config/.env.example
+config/.env
+*.pem
+*.p12
+*.pfx
+*.key
+
+# A source checkout is not a place to commit a user's configured installation.
+# The tracked YAML files below are clean defaults for packaging; use a separate
+# unpacked install for personal topics, destinations, and schedule changes.
+config/authors.yaml
+config/sources.md
+config/topics.md
+config/*.local.yaml
+config/*.bak
+
+# User-created trust registries (only the *.example.md templates are public).
+sources/trusted-registry.md
+sources/always-volatile-domains.md
+
+# Runtime research and vault content can contain licensed text, private source
+# choices, and reader notes. Keep the two deliberate example concepts/READMEs.
+/planning/research/
+/brain/authors/
+/brain/concepts/*
+!/brain/concepts/example-concept-a.md
+!/brain/concepts/example-concept-b.md
+/brain/lessons/*
+!/brain/lessons/README.md
+/brain/playbooks/*
+!/brain/playbooks/README.md
+/pipeline/registry.md
+/pipeline/0-archive/
+/pipeline/1-incoming/
+/pipeline/2-curated/
+/pipeline/3-synthesis/
+
+# --- Runtime delivery state (ephemeral) ---
+# Per-digest delivery receipts; regenerated at send time, never shipped.
+pipeline/3-synthesis/.delivered/
+
+# --- Operational health / run-history log (runtime, never shipped) ---
+# Append-only JSONL written by collect / deliver / weekly-run for observability.
+pipeline/.health/
+
+# --- Source-intelligence decision journal (runtime, never shipped) ---
+# Append-only JSONL: one row per candidate the collector considered. Rotated by
+# rotate_pipeline.py; relocates with RESEARCH_BRAIN_STATE_DIR.
+pipeline/.source-insights/
+
+# --- Reader-feedback log (runtime, never shipped) ---
+# Carries the reader's own words from chat; it belongs with the other runtime
+# logs above, not in git. (Was missing here while .health/ and .delivered/ were
+# listed — an oversight, not a decision.)
+pipeline/.feedback/
+
+# --- Run lock (runtime mutual-exclusion for the gated pipeline) ---
+# Held by weekly-run / run-now while a run is in progress; never shipped.
+# Glob covers the ephemeral swap siblings (.reclaiming/.release.*/.tmp.*) a hard
+# kill mid-reclaim could leave behind — they are runtime-only, never tracked.
+pipeline/.run.lock*
+
+# --- Per-file advisory locks (registry / delivery read-modify-write) ---
+# Sibling .lock files created by scripts/registry.py + delivery; runtime only.
+# Scoped to pipeline/ so a top-level lock like uv.lock is never matched.
+pipeline/*.lock
+pipeline/**/*.lock
+
+# --- Strict-gate quarantine + pre-write staging (synthesis hygiene) ---
+# Failing concepts moved aside by validate_brain.py --quarantine, and the
+# last-known-good snapshots used by --restore-from; runtime only, never shipped.
+pipeline/3-synthesis/.quarantine/
+pipeline/3-synthesis/.staging/
+
+# --- Sanitized incoming companions (derived anti-injection artifacts) ---
+# Regenerated from incoming articles by scripts/sanitize_incoming.py; runtime only.
+pipeline/1-incoming/**/sanitized/
+
+# --- Synthesis freshness sidecars (re-synthesis trigger state) ---
+# Per-topic curated-index hash written by scripts/synthesis_freshness.py; runtime only.
+pipeline/3-synthesis/**/.synthesis-meta.json
+
+# --- CI / tooling caches + artifacts (never shipped) ---
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+__pycache__/
+
+# --- OS ---
+.DS_Store
+
+# --- Obsidian ---
+# The vault root is brain/, so .obsidian lives there. The entire .obsidian config
+# is per-machine vault state (theme, enabled plugins, graph layout, open panes) that
+# drifts on every run; Obsidian regenerates sensible defaults on first open, so we
+# ship none of it. Keeping it tracked only made the live clone's tree perpetually dirty.
+brain/.obsidian/
+
+# --- Runtime reports (regenerated each run) ---
+pipeline/3-synthesis/digest_*.md
+pipeline/3-synthesis/digest_*.audit.json
+pipeline/3-synthesis/digest_*.html
+pipeline/3-synthesis/digest_*.report.html
+pipeline/3-synthesis/synthesis-run_*.md
+pipeline/3-synthesis/brain-health_*.md
+pipeline/3-synthesis/trends_*.md
+pipeline/3-synthesis/trends_*.html
+pipeline/3-synthesis/trends_*.report.html
+pipeline/3-synthesis/source-insights_*.report.html
+
+# Playwright MCP scratch (browser automation artifacts)
+.playwright-mcp/
+
+# Generated by scripts/install_schedule.py — install-specific absolute paths.
+crontab-research-brain.txt

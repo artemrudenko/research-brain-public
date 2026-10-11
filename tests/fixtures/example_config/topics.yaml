@@ -1,0 +1,10 @@
+schema_version: 2
+# config/topics.yaml — monitored topics (the ACTIVE config).
+# Machine-written by scripts/manage_sources.py / the setup-wizard: the VALUES are
+# yours to edit; comments and formatting are regenerated on every change.
+# Per-topic keys: name (slug, = the pipeline/1-incoming/<name>/ folder and the
+#   sources.yaml category) / tags (frontmatter tags for collected articles)
+#   / include (what belongs) / exclude (what to drop or route elsewhere).
+# This is the ONLY config format (0.8.0+): legacy topics.md sections are
+# import-only via `python3 scripts/schema.py migrate-config`.
+topics: []

@@ -1,0 +1,50 @@
+# config/schedule.yaml — Collection & digest cadence.
+# Schema is fixed (see docs/CONVENTIONS.md §2.2). Cron syntax: "min hour day month weekday".
+
+# Weekly order: collect (ongoing, every 3 days) → curate (Mon 08:00) →
+# synthesis (Mon 08:30) → digest (Mon 09:00).
+schema_version: 1   # config contract version (CONVENTIONS §5.4); leave as-is. Absent == 1.
+
+collect:
+  cron: "0 9 */3 * *"          # every 3 days at 09:00 — scan sources, save new articles
+  candidate_pool_per_topic: 25 # gather up to N candidates per topic across all source roles…
+  max_articles_per_topic: 10   # …then rank and read/save the best N (the saved cap)
+
+curate:
+  cron: "0 8 * * 1"         # Mondays at 08:00 — before synthesis and digest
+  min_text_chars: 500       # relevance threshold for a candidate
+
+synthesis:
+  cron: "30 8 * * 1"        # Mondays at 08:30 — after curate
+  min_sources_per_topic: 3  # curated sources per topic needed for auto-synthesis
+
+digest:
+  cron: "0 9 * * 1"         # Mondays at 09:00 — build & deliver the digest
+  lookback_days: 7          # include items collected in the last N days
+
+# OPTIONAL second cadence (ADR 0016): a light DAILY "inflow" digest — just the new
+# sources that arrived + anything needing attention, no synthesis. Uncomment to
+# enable; build it with `build_digest.py --daily` (writes digest_daily_<date>.md).
+# Absent → no daily digest (the weekly block above is unaffected).
+# daily_digest:
+#   cron: "0 8 * * *"        # every day at 08:00
+#   lookback_days: 1         # one day's arrivals
+
+# Weekly trends (ADR 0017): how things change over time — topic volume this week
+# vs last, rising tags, activity, and knowledge growth.
+#   • DEFAULT — `build_digest.py` embeds the trends section inline in every
+#     non-quiet weekly digest (no cron block needed; `--no-trends` disables;
+#     `--report` adds the dynamic, browser-grade HTML viewing page).
+#   • Standalone report file: `trends.py` (writes trends_<date>.md). Uncomment below.
+# weekly_trends:
+#   cron: "0 10 * * 1"       # Mondays at 10:00 (after the weekly digest)
+
+# Timezone all cron times above are interpreted in. Default "UTC".
+# Example: "Europe/Minsk". See docs/scheduling.md for how it applies to
+# /schedule cloud agents vs external cron (CRON_TZ / box TZ).
+timezone: "UTC"
+
+# Recommended: run the whole weekly pipeline in one gated, in-order pass via
+# schedule/weekly-run.md (collect→curate→synthesis→digest→deliver) instead of
+# four separate cron entries — see docs/scheduling.md. The individual crons
+# above remain valid for users who prefer separate headless jobs.

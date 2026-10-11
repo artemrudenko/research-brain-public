@@ -1,0 +1,46 @@
+# config/codex-profiles.example.toml — GENERATED from config/agents.yaml by
+# scripts/gen_agents.py. Do not hand-edit; edit the spec and regenerate.
+#
+# Maps the pipeline roles onto Codex per-profile MODEL + REASONING-EFFORT tiering
+# (the cost lever). Codex has NO per-profile tool/MCP allowlist, so capability
+# isolation on Codex is the S1-S9 sanitize gate, not the profile (moot for
+# delivery — on Codex that is the headless deliver.py script, not an MCP tool).
+#
+# Apply: put the BASE block in ~/.codex/config.toml. Recent Codex selects a profile
+# via `codex exec -p <name>`, layering $CODEX_HOME/<name>.config.toml on the base,
+# so split each [profiles.rb-*] block into its own ~/.codex/rb-*.config.toml file
+# (older Codex reads the [profiles.*] blocks straight from config.toml). Whole run
+# at one tier: CODEX_PROFILE=rb-synthesizer schedule/codex-run.sh. Per-step tiering:
+# run the component cron jobs, each `codex exec -p rb-<role>`. Full how-to:
+# docs/scheduling.md "C. Codex". Model IDs are placeholders — set them in
+# config/agents.yaml to models your account exposes (verify with `codex`).
+
+approval_policy = "never"
+sandbox_mode    = "workspace-write"
+
+[sandbox_workspace_write]
+network_access = true
+
+[profiles.rb-collector]
+model = "gpt-5.1-codex-mini"
+model_reasoning_effort = "low"
+
+[profiles.rb-curator]
+model = "gpt-5.1-codex-mini"
+model_reasoning_effort = "medium"
+
+[profiles.rb-synthesizer]
+model = "gpt-5.1-codex"
+model_reasoning_effort = "high"
+
+[profiles.rb-critic]
+model = "gpt-5.1-codex-mini"
+model_reasoning_effort = "medium"
+
+[profiles.rb-digest-maker]
+model = "gpt-5.1-codex-mini"
+model_reasoning_effort = "low"
+
+[profiles.rb-deliverer]
+model = "gpt-5.1-codex-mini"
+model_reasoning_effort = "low"

@@ -1,0 +1,112 @@
+# Project metadata + tooling config for research-brain.
+# Managed with uv (https://docs.astral.sh/uv/): `uv sync` creates .venv and installs
+# the runtime + dev dependencies from this file, pinned by uv.lock. pytest config
+# stays in pytest.ini (dev checkout only — like tests/, it is stripped from the
+# shipped archive). pytest + coverage, ruff, mypy and bandit are the BLOCKING CI
+# gates — see docs/BACKLOG.md.
+
+[project]
+name = "research-brain"
+version = "0.1.0"
+description = "Topic-agnostic research brain: monitors sources, builds linked concepts, ships a weekly digest."
+readme = "README.md"
+# Declared here as well as in LICENSE: the file is what a reader sees, this is
+# what packaging metadata reports. Kept in lockstep by tests/test_packaging.py.
+license = { text = "MIT" }
+# Floor is 3.11 (uses `from __future__ import annotations`, PEP 585 generics, stdlib
+# zoneinfo); kept in lockstep with ruff target-version and mypy python_version below.
+requires-python = ">=3.11"
+# The ONLY third-party runtime dependency. Everything else is the Python stdlib
+# (urllib, fcntl, smtplib, zoneinfo, …). Capped below the next major so a PyYAML 7
+# never silently lands in a cron/headless install.
+dependencies = [
+    "pyyaml>=6,<7",
+]
+
+# PEP 735 dependency group — installed by `uv sync` by default, skipped by
+# `uv sync --no-dev`. These are the CI quality-gate tools, not runtime deps.
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "bandit>=1.7",
+]
+
+# 0.8.0 (BACKLOG item 2): the project installs itself (editable) into the venv, so
+# `import scripts` works venv-wide with NO sys.path hacks — tests, subprocesses, and
+# console_scripts all resolve the same package. The zip-run contract is unchanged:
+# every documented `python3 scripts/X.py` still works with zero installation via the
+# CLIs' own guarded prelude (stdlib-only tools even on bare /usr/bin/python3).
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["scripts"]
+
+# Operator CLIs, additive to the canonical `python3 scripts/X.py` invocations —
+# available on PATH inside the venv (`rb-doctor` etc.) once `uv sync` has run.
+[project.scripts]
+rb-collect = "scripts.collect:main"
+rb-digest = "scripts.build_digest:main"
+rb-deliver = "scripts.delivery.deliver:main"
+rb-doctor = "scripts.doctor:main"
+rb-health = "scripts.health:main"
+rb-setup-check = "scripts.setup_check:main"
+rb-sanitize = "scripts.sanitize_incoming:main"
+rb-trends = "scripts.trends:main"
+
+[tool.ruff]
+# The codebase targets Python 3.11+ (uses `from __future__ import annotations`,
+# `list[...]` / `dict[...]` generics, the stdlib `zoneinfo`).
+target-version = "py311"
+line-length = 100
+extend-exclude = [".venv", "pipeline", "brain"]
+
+[tool.ruff.lint]
+# A pragmatic starter ruleset; expand toward strict once the baseline is clean.
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = [
+    "E501",   # line length — advisory-noisy on prose-heavy modules
+    "UP042",  # str+Enum is intentional (JSON-serialisable values); StrEnum would
+              # change str() semantics and needs 3.11+ everywhere
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests inject the project root onto sys.path before importing `scripts`, so the
+# package imports legitimately follow a statement (not import-at-top).
+"tests/*" = ["E402"]
+
+[tool.mypy]
+python_version = "3.11"
+files = ["scripts"]
+# scripts/ is a namespace package (no __init__.py); these let mypy resolve the
+# `from .. import build_digest` fallback in delivery/deliver.py.
+namespace_packages = true
+explicit_package_bases = true
+mypy_path = "."
+ignore_missing_imports = true
+warn_unused_ignores = true
+# No-untyped-defs is now enforced: every function must carry full annotations
+# (params + return). check_untyped_defs stays on so bodies are checked too.
+check_untyped_defs = true
+disallow_untyped_defs = true
+exclude = "(^|/)(\\.venv|pipeline|brain)/"
+
+[tool.coverage.run]
+source = ["scripts"]
+omit = ["*/tests/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+# Blocking coverage floor (honored by `coverage report` and pytest-cov, so the
+# CI `pytest --cov` step fails under it). Set a couple of points below the current
+# baseline (~90%) so normal churn doesn't flap the gate; raise as coverage grows.
+fail_under = 88
+
+[tool.bandit]
+# Scan the runtime scripts only; tests intentionally use assert + tmp files.
+exclude_dirs = ["tests", ".venv", "pipeline", "brain"]

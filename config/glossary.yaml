@@ -1,0 +1,84 @@
+# config/glossary.yaml — plain-language explanations of complex terms & acronyms.
+#
+# Each entry under `terms:` maps a TERM (as it appears in your sources — usually
+# an acronym like "RAG") to a one-line, jargon-free explanation. When a digest
+# is built, every term that ACTUALLY appears in it is appended to a "📖 Glossary"
+# section at the end; unused entries cost nothing, so a plain digest stays clean.
+#
+# Matching is whole-word and case-sensitive, with an optional trailing plural
+# "s" — so "API" matches "API" and "APIs", but never "capital" or lowercase
+# "api". Order here is the order rendered in the section.
+#
+# This file is OPTIONAL and yours to garden: add the acronyms your topics use,
+# reword explanations for your audience, or delete the file to turn the glossary
+# off entirely. Pairs naturally with delivery.technical_level (see
+# docs/audience-levels.md) — keep it for a non-technical or balanced audience.
+
+terms:
+  # ── AI / ML ────────────────────────────────────────────────────────────────
+  AI: "Artificial Intelligence — software that performs tasks normally needing human intelligence."
+  AGI: "Artificial General Intelligence — a hypothetical AI matching human ability across most tasks, not just narrow ones."
+  LLM: "Large Language Model — an AI trained on large amounts of text to understand and generate language."
+  GPT: "Generative Pre-trained Transformer — a common type of language model behind many text-generating AI systems."
+  ChatGPT: "OpenAI's conversational AI product, used for asking questions, drafting text, and working with tools."
+  RAG: "Retrieval-Augmented Generation — fetching relevant documents and giving them to a model before it answers, so replies are grounded in real sources."
+  RLHF: "Reinforcement Learning from Human Feedback — tuning a model using human preference ratings to make it more helpful."
+  MCP: "Model Context Protocol — an open standard that lets AI assistants connect to external tools and data sources."
+  fine-tuning: "Further training a general model on a narrower dataset so it specializes for a specific task or domain."
+  embedding: "A list of numbers representing text/image meaning, so software can compare items by similarity."
+  embeddings: "Lists of numbers representing meaning, so software can compare texts/images by similarity."
+  inference: "Running a trained model to get an answer (as opposed to training it)."
+  hallucination: "When a model states something confidently that is false or made up."
+  multimodal: "A model that handles more than one kind of input/output — e.g. text plus images or audio."
+  agentic: "AI that plans and takes multi-step actions with tools on its own, rather than just answering once."
+  prompt: "The instruction/text given to a language model to get a response."
+  token: "The small chunk of text (roughly a word-piece) a language model reads and generates in."
+  quantization: "Shrinking a model by storing its numbers at lower precision, so it runs faster and cheaper."
+  benchmark: "A standard test used to compare models or systems on the same task."
+  RL: "Reinforcement Learning — training by trial-and-error against rewards, rather than from labelled examples."
+  LoRA: "Low-Rank Adaptation — a lightweight fine-tuning method that trains a small add-on instead of the whole model."
+  PEFT: "Parameter-Efficient Fine-Tuning — tuning only a small fraction of a model's weights to specialise it cheaply."
+  CP: "Context Parallelism — splitting long model context across compute resources so larger inputs or designs can fit."
+  KAT: "A coding-focused AI model family referenced by KAT-Coder reports."
+  GPU: "Graphics Processing Unit — hardware that parallelizes the heavy math behind training and running AI models."
+  TPU: "Tensor Processing Unit — a custom chip built specifically to accelerate AI training and inference."
+  IR: "Information Retrieval — the field of finding relevant documents for a query; what search engines and RAG systems do."
+  OWL: "Web Ontology Language — a standard for representing concepts and relationships so software can reason about them."
+  # ── Software / SDLC ────────────────────────────────────────────────────────
+  API: "Application Programming Interface — a defined way for one program to call another."
+  SDK: "Software Development Kit — the libraries and tools for building on top of a platform."
+  SDLC: "Software Development Life Cycle — the stages of building software, from planning to release and maintenance."
+  SDD: "Spec-Driven Development — steering (often AI-generated) code with formal specifications kept traceable to requirements."
+  CI: "Continuous Integration — automatically testing code changes before they are merged or released."
+  CI/CD: "Continuous Integration / Continuous Delivery — automation that tests and ships code changes quickly and safely."
+  CircleCI: "A cloud CI/CD service that runs automated software builds and tests."
+  PR: "Pull Request — a proposed set of code changes submitted for review before merging."
+  PRINCE: "A software-agent workflow pattern that routes context to specialised agents and keeps review state explicit."
+  SLA: "Service-Level Agreement — a promised level of service (e.g. uptime) a provider commits to."
+  SLO: "Service-Level Objective — an internal target for reliability/performance a team aims to meet."
+  latency: "The delay between a request and its response — lower is faster."
+  throughput: "How much work a system handles per unit time (e.g. requests per second)."
+  observability: "How well you can understand a system's internal state from its logs, metrics, and traces."
+  OSS: "Open-Source Software — software whose source code is public and free to use and modify."
+  JVM: "Java Virtual Machine — the runtime that executes compiled Java (and other JVM-language) code across platforms."
+  System/360: "IBM's landmark 1964 family of compatible mainframes — the project whose lessons became 'The Mythical Man-Month'."
+  # ── Marketing / growth ─────────────────────────────────────────────────────
+  SEO: "Search Engine Optimization — improving a site so it ranks higher in search results."
+  AEO: "Answer Engine Optimization — shaping content so AI answer engines cite it; the AI-era counterpart to SEO."
+  CRM: "Customer Relationship Management — software for tracking customers, deals, and interactions."
+  CTR: "Click-Through Rate — the share of people who click a link/ad out of those who saw it."
+  CAC: "Customer Acquisition Cost — the average spend to gain one new customer."
+  LTV: "Lifetime Value — the total revenue expected from a customer over the whole relationship."
+  ROI: "Return on Investment — the gain from an action relative to its cost."
+  # ── Web / infrastructure ───────────────────────────────────────────────────
+  RSS: "Really Simple Syndication — a feed format that lets software subscribe to a site's new posts automatically."
+  SSRF: "Server-Side Request Forgery — an attack that tricks a server into making requests to unintended internal targets."
+  PDF: "Portable Document Format — a fixed-layout document format commonly used for sharing reports and papers."
+  V2: "Version 2 — a second major version of a product, model, or specification."
+  XACML: "eXtensible Access Control Markup Language — a standard policy language for access-control decisions."
+  # ── Hardware / semiconductors ──────────────────────────────────────────────
+  EUV: "Extreme Ultraviolet lithography — the advanced light-based process used to print the smallest chip features."
+  # ── Companies / publication labels ─────────────────────────────────────────
+  SpaceX: "A private aerospace company best known for reusable rockets and satellite internet."
+  PRESS: "A publication label indicating press or media-facing material."
+  RELEASE: "A publication label indicating an official announcement or released statement."

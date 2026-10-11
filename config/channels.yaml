@@ -1,0 +1,50 @@
+# config/channels.yaml — Digest delivery channels.
+# Schema is fixed (see docs/CONVENTIONS.md §2.1). Edit values, not structure.
+#
+# enabled=false  -> channel is skipped.
+# Secrets are NOT stored here — only the NAME of an env var (the *_env fields).
+# Put the real values in config/.env (gitignored). See config/.env.example.
+schema_version: 1   # config contract version (CONVENTIONS §5.4); leave as-is. Absent == 1.
+delivery:
+  language: en              # digest language: en | ru | ...
+
+  # Audience presentation level — how much is explained vs assumed in the digest and
+  # interactive answers. Render-time only; it does NOT change stored knowledge in brain/.
+  #   technical     -> terse, keeps jargon, raw specifics (versions/numbers/API names)
+  #   balanced      -> defines non-obvious terms on first use; one plain-language takeaway each
+  #   non-technical -> leads with "why it matters", expands acronyms, analogies, fewer raw IDs
+  # Absent → balanced. See docs/audience-levels.md. Change later via setup-wizard or /audience.
+  technical_level: balanced
+
+  # Opt-in DEGRADED health ping (scripts/health_alert.py) — default OFF. Uncomment
+  # and set `channel:` to one of the channels below to push a one-line alert when
+  # the health verdict is DEGRADED. As shipped (commented out) it is a no-op.
+  # alerts:
+  #   enabled: false         # set true to opt in
+  #   channel: telegram      # which configured channel to alert through
+
+  # Opt-in PRE-SEND review gate (skills/digest-review/SKILL.md) — default OFF. Uncomment
+  # and set true to have digest-review vet a built digest (claims grounded in cited
+  # sources, injection-leak scan, link checks) between the delivery rehearsal and the
+  # real send. Boolean; as shipped (commented out) it is a no-op.
+  # pre_send_review: false   # set true to opt in
+
+  email:
+    enabled: false
+    provider: gmail-mcp     # gmail-mcp (in Cowork/Claude Code) | smtp (headless/cron)
+    to: []                  # list of recipient addresses, e.g. ["you@example.com"]
+    smtp:                   # used only when provider: smtp
+      host: ""              # SMTP server host, e.g. smtp.gmail.com
+      port: 587
+      user: ""              # SMTP username (usually the sender address)
+      password_env: SMTP_PASSWORD   # env var holding the SMTP password
+
+  telegram:
+    enabled: false
+    transport: mcp          # mcp (telegram MCP) | bot-api (headless/cron)
+    chat_id: ""             # target chat id (numeric) or @channel username
+    token_env: TELEGRAM_BOT_TOKEN   # env var holding the bot token (only when transport: bot-api)
+
+  rocketchat:
+    enabled: false
+    webhook_url_env: ROCKETCHAT_WEBHOOK_URL   # env var holding the incoming webhook URL (no OAuth)
