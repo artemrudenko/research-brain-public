@@ -1,6 +1,7 @@
 """Rendering and output of a hygiene pass: the human summary, the durable
 brain-health report the digest later reads, and the `--json` serialization.
 """
+
 from __future__ import annotations
 
 from datetime import date
@@ -18,6 +19,7 @@ _KIND_TITLES = [
     ("broken-link", "Broken links"),
     ("missing-sources", "Missing sources"),
     ("uncited-fact", "Uncited key facts"),
+    ("problem-solution", "Problem-solution profile"),
     ("missing-from-index", "Missing from INDEX.md"),
     ("stale", "Stale (needs re-verification)"),
     ("tag", "Tag hygiene"),
@@ -30,7 +32,7 @@ def render_summary(health: BrainHealth, *, today: date) -> str:
         f"# Brain health — {today.isoformat()}",
         "",
         health.health_headline,  # machine-matched `Health:` line for the digest
-        health.headline,         # human-readable summary line
+        health.headline,  # human-readable summary line
         "",
     ]
     if not health.warnings:
@@ -78,13 +80,13 @@ def health_to_dict(health: BrainHealth) -> dict[str, object]:
         "broken_links": health.broken_links,
         "missing_sources": health.missing_sources,
         "uncited_facts": health.uncited_facts,
+        "problem_solution_findings": health.problem_solution_findings,
         "missing_from_index": health.missing_from_index,
         "stale": health.stale,
         "tag_findings": health.tag_findings,
         "headline": health.headline,
         "health_headline": health.health_headline,
         "warnings": [
-            {"kind": w.kind, "concept": w.concept, "message": w.message}
-            for w in health.warnings
+            {"kind": w.kind, "concept": w.concept, "message": w.message} for w in health.warnings
         ],
     }

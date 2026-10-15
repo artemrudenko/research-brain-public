@@ -54,9 +54,19 @@ def search_knowledge(
     query: str,
     topic_filter: str | None = None,
     request_mode: Literal["vault_only", "research"] = "vault_only",
+    programming_language: str | None = None,
+    problem_type: str | None = None,
+    knowledge_kind: Literal["problem_solution"] | None = None,
 ) -> str:
     """Search up to two concepts; research mode returns a handoff hint but performs no research."""
-    return _reader().search(query, topic_filter, request_mode)
+    return _reader().search(
+        query,
+        topic_filter,
+        request_mode,
+        programming_language=programming_language,
+        problem_type=problem_type,
+        knowledge_kind=knowledge_kind,
+    )
 
 
 @mcp.tool(annotations=_READ_ONLY_ANNOTATIONS)

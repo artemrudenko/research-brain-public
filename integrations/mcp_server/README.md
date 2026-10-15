@@ -22,6 +22,16 @@ Obsidian file server, research runner, or autonomous writer.
   heading. Technical terms are still literal: synonyms, translations, and paraphrases may miss.
 - Results include the vault-relative note path, recorded sources, confidence, open gaps, and
   freshness metadata. `last_updated` is explicitly not treated as source re-verification.
+- Notes marked `knowledge_kind: problem_solution` also return recorded evidence scope and
+  applicability in search results. Truncated applicability directs the host to `get_concept`.
+  Optional `programming_language`, `problem_type` and `knowledge_kind=problem_solution` filters
+  match metadata exactly (case-insensitive), combine with AND and support an empty query
+  for browsing within the existing result cap. Missing/malformed fields never match.
+  The fuller read prioritizes applicability, verification and reuse observations before
+  the remaining problem/solution sections. These are recorded claims, not independent
+  validation; evidence scope is never promoted automatically. The core
+  [problem-solution workflow](../../docs/problem-solutions.md) validates and saves exact
+  proposals after direct owner approval, separately from this read-only server.
 - Malformed source URLs and URLs with user-info or common token/signature query parameters
   are omitted from the returned text, including when they appear in the note body. Archive
   references are included only when they are safe vault-relative paths. This is a narrow

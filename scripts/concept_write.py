@@ -54,9 +54,7 @@ def _contained_dest(path: Path, root: Path) -> Path:
     concepts_root = (root / Path(*_CONCEPTS_SUBDIR)).resolve()
     resolved = path.resolve()
     if not resolved.is_relative_to(concepts_root):
-        raise ValueError(
-            f"unsafe concept path (must resolve inside {concepts_root}): {path}"
-        )
+        raise ValueError(f"unsafe concept path (must resolve inside {concepts_root}): {path}")
     return resolved
 
 
@@ -103,7 +101,7 @@ def ensure_index_entry(dest: Path, body: str, root: Path) -> bool:
         head, _, tail = text.partition(_RECENT_HEADER)
         cut = _NEXT_SECTION_RE.search(tail)
         if cut:
-            section, rest = tail[: cut.start()], tail[cut.start():]
+            section, rest = tail[: cut.start()], tail[cut.start() :]
             new = f"{head}{_RECENT_HEADER}{section.rstrip()}\n{entry}\n{rest}"
         else:
             new = f"{head}{_RECENT_HEADER}{tail.rstrip()}\n{entry}\n"
@@ -162,6 +160,24 @@ def main(argv: list[str] | None = None) -> int:
         text = Path(args.body_file).read_text(encoding="utf-8")
     else:
         text = sys.stdin.read()
+
+    # Project-generated findings have a separate exact-proposal approval boundary.
+    # The trusted workflow reuses the atomic writer, after checking the full package.
+    from scripts.problem_solutions.profile import parse_record
+
+    try:
+        metadata, _ = parse_record(text)
+    except ValueError:
+        metadata = {}
+        if "knowledge_kind" in text:
+            print("ERROR: malformed knowledge profile; use problem_solution.py", file=sys.stderr)
+            return 2
+    if "knowledge_kind" in metadata:
+        print(
+            "ERROR: profiled records require problem_solution.py propose/review/apply approval",
+            file=sys.stderr,
+        )
+        return 2
 
     atomic_write_text(dest, text)
     print(f"OK: wrote → {dest}")

@@ -4,6 +4,7 @@ The advisory checks (orphans, broken links, missing sources, staleness, tag
 hygiene, INDEX completeness) share their primitives with the write-time
 `gate_concepts` gate so the two can never drift (CONVENTIONS §11/§13).
 """
+
 from __future__ import annotations
 
 import os
@@ -81,8 +82,10 @@ def check_orphan(
 
     # No graph edge. Does it at least share a tag with another concept?
     shares_tag = any(
-        any(other != concept.stem for other in tag_to_concepts.get(
-            normalize_tag(tag, registry), set()))
+        any(
+            other != concept.stem
+            for other in tag_to_concepts.get(normalize_tag(tag, registry), set())
+        )
         for tag in concept.tags
     )
     if shares_tag:
@@ -212,10 +215,53 @@ def _source_has_url(entry: object) -> bool:
     if isinstance(entry, str):
         text = entry.strip()
         if text.lower().startswith("url:"):  # fallback-flattened `url: "https://…"`
-            text = text[len("url:"):].strip()
+            text = text[len("url:") :].strip()
         text = text.strip("\"'")
         return _is_verifiable_url(text)
     return False
+
+
+def _problem_solution_errors(concept: Concept) -> list[str] | None:
+    from scripts.problem_solutions.profile import (
+        MAX_BYTES,
+        archive_path,
+        parse_record,
+        validate_record,
+    )
+
+    if not concept.path.is_file():
+        return None
+    if concept.path.stat().st_size > MAX_BYTES:
+        return ["profile exceeds byte limit"]
+    text = concept.path.read_text(encoding="utf-8")
+    try:
+        meta, _ = parse_record(text)
+    except ValueError as exc:
+        return [str(exc)] if "knowledge_kind" in text else None
+    if "knowledge_kind" not in meta:
+        return None
+    errors = validate_record(text)
+    root = concept.path.parent.parent.parent
+    for source in meta.get("sources", []) if isinstance(meta.get("sources"), list) else []:
+        if not isinstance(source, dict) or not archive_path(source.get("archive")):
+            continue
+        relative = source["archive"]
+        target = root
+        unsafe = False
+        for part in Path(relative).parts:
+            target /= part
+            unsafe = unsafe or target.is_symlink()
+        if unsafe or not target.is_file():
+            errors.append("retained evidence missing or symlinked: " + relative)
+    return errors
+
+
+def check_problem_solution(concept: Concept) -> list[Warning]:
+    """Advisory and write-time profile checks share the authoritative validator."""
+    return [
+        Warning(kind="problem-solution", concept=concept.stem, message=error)
+        for error in (_problem_solution_errors(concept) or [])
+    ]
 
 
 def check_missing_sources(concept: Concept) -> Warning | None:
@@ -228,6 +274,8 @@ def check_missing_sources(concept: Concept) -> Warning | None:
     if concept.note_type != "concept":
         return None
     if any(_source_has_url(s) for s in concept.sources):
+        return None
+    if _problem_solution_errors(concept) == []:
         return None
     return Warning(
         kind="missing-sources",
@@ -346,7 +394,7 @@ def check_keyfacts_citation(concept: Concept) -> list[Warning]:
                     message=(
                         f"'{concept.stem}' has a key fact with no inline source — "
                         f"every '## Key facts' bullet must cite a source "
-                        f"(Source:/[[wikilink]]/URL): \"{bullet[:80]}\" "
+                        f'(Source:/[[wikilink]]/URL): "{bullet[:80]}" '
                         f"(anti-hallucination, CONVENTIONS §5.1)."
                     ),
                 )
@@ -369,9 +417,7 @@ def check_pending_cap(concept: Concept, registry: TagRegistry) -> Warning | None
     pending = _normalized_pending(registry)
     if not pending:
         return None
-    pending_tags = sorted(
-        {tag for tag in concept.tags if normalize_tag(tag, registry) in pending}
-    )
+    pending_tags = sorted({tag for tag in concept.tags if normalize_tag(tag, registry) in pending})
     if len(pending_tags) <= 1:
         return None
     return Warning(
@@ -436,9 +482,7 @@ def _is_off_vocabulary(normalized: str, registry: TagRegistry) -> bool:
     )
 
 
-def check_tags(
-    concepts: list[Concept], registry: TagRegistry
-) -> list[Warning]:
+def check_tags(concepts: list[Concept], registry: TagRegistry) -> list[Warning]:
     """Tag-hygiene findings: normalization, synonym merges, pending, one-offs.
 
     Per CONVENTIONS §11:
@@ -561,9 +605,7 @@ def index_lists_stem(index_text: str, stem: str) -> bool:
     return lowered_stem in linked or lowered_stem in index_text.lower()
 
 
-def check_index_completeness(
-    concepts: list[Concept], index_path: Path
-) -> list[Warning]:
+def check_index_completeness(concepts: list[Concept], index_path: Path) -> list[Warning]:
     """Flag non-seed concepts absent from the `brain/INDEX.md` MOC fallback.
 
     `brain/INDEX.md` is LLM/hand-maintained (CONVENTIONS §14) and can drift
@@ -630,6 +672,7 @@ def gate_concepts(paths: list[Path], registry: TagRegistry) -> list[Warning]:
         if missing:
             warnings.append(missing)
         warnings.extend(check_keyfacts_citation(concept))
+        warnings.extend(check_problem_solution(concept))
         pending_cap = check_pending_cap(concept, registry)
         if pending_cap:
             warnings.append(pending_cap)

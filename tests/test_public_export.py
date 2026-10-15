@@ -29,6 +29,18 @@ def test_export_keeps_source_and_examples_but_omits_private_and_runtime_files() 
     assert export_public.classify("docs/adr/0024-scholarly-author-ingestion.md") == "exclude"
     assert export_public.classify("pipeline/registry.md") == "review"
     assert export_public.classify("config/authors.yaml") == "review"
+    assert export_public.classify("docs/problem-solutions.md") == "include"
+    assert export_public.classify("scripts/problem_solution.py") == "include"
+    assert export_public.classify("pipeline/.learning/proposals/private/proposal.json") == "exclude"
+    assert export_public.classify("planning/research/project-evidence.md") == "exclude"
+    assert export_public.classify("docs/publications/article.md") == "exclude"
+
+
+def test_export_requires_complete_public_problem_solution_workflow() -> None:
+    blobs = _minimal_blobs()
+    blobs.pop("integrations/mcp_server/examples/fixtures/problem-solution.md")
+    with pytest.raises(ValueError, match="public snapshot missing required files"):
+        export_public.select_public(blobs)
 
 
 def test_export_refuses_unclassified_files_and_modified_seed() -> None:

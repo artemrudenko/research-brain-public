@@ -58,6 +58,12 @@ See [`docs/architecture.md`](docs/architecture.md) for the component/data-flow v
   fallback *are* the index — do **not** generate auxiliary indices, knowledge-graph files, or
   AUTO_INDEX artifacts. Knowledge mutation flows through `wiki-ingest` (write) and `wiki-query`
   (read). (CONVENTIONS §5.1, §14)
+- **Project problem-solution records are approved packages.** Keep them as `type: concept`,
+  `knowledge_kind: problem_solution` in `brain/concepts/`. Use `scripts/problem_solution.py`
+  to validate, propose, review and apply exact changes after direct owner approval, following
+  `docs/problem-solutions.md`. Candidates stay in `pipeline/.learning/`, outside retrieval.
+  MCP remains read-only; scheduled synthesis holds profile updates for interactive review.
+  Recorded evidence scope is never promoted automatically.
 - **Tags are a controlled vocabulary.** Concept tags are nested `domain/topic`, chosen
   **closed-book** from `config/tags.yaml` only (2–5 per note, ≥1 domain-level tag). If nothing
   fits, propose ≤1 new tag into the `pending:` quarantine — never write a new tag straight into

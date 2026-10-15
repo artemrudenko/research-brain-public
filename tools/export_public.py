@@ -33,6 +33,7 @@ DOC_FILES = {
     "CONVENTIONS.md", "MCP-PILOT.md", "OPERATIONS.md", "PILOT.md", "SUPPORT.md",
     "WALKTHROUGH.md", "architecture.md", "audience-levels.md", "feedback.md",
     "scheduling.md", "telegram-commands.md", "telegram-multiproject.md", "updating.md",
+    "problem-solutions.md",
 }
 CONFIG_FILES = {
     ".env.example", "README.md", "agents.yaml", "channels.yaml",
@@ -58,7 +59,7 @@ EXCLUDED_FILES = {
 }
 EXCLUDED_PREFIXES = (
     ".planning/", "planning/", "docs/decks/", "docs/private-history/", "docs/publications/",
-    "skills/release/",
+    "skills/release/", "pipeline/.learning/",
 )
 REQUIRED_FILES = {
     ".gitignore", ".github/workflows/ci.yml", "AGENTS.md", "CHANGELOG.md",
@@ -66,6 +67,11 @@ REQUIRED_FILES = {
     "config/channels.yaml", "config/sources.yaml", "config/topics.yaml",
     "brain/INDEX.md", "brain/concepts/example-concept-a.md", "pipeline/README.md",
     "scripts/collect.py", "tests/test_dist.py", "tools/export_public.py",
+    "docs/problem-solutions.md", "scripts/problem_solution.py",
+    "scripts/problem_solutions/profile.py", "scripts/problem_solutions/workflow.py",
+    "skills/wiki-ingest/assets/problem-solution-template.md",
+    "integrations/mcp_server/examples/problem_solution.py",
+    "integrations/mcp_server/examples/fixtures/problem-solution.md",
 }
 
 # These files are changed by a configured installation. Explicit hashes keep a

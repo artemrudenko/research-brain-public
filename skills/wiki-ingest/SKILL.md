@@ -109,6 +109,24 @@ the normal verdict gate for each CREATE/UPDATE; never use the unattended weekly 
 request path. If the consuming host cannot access that checkout and run `wiki-ingest`, return a
 source-linked proposal to the user; do not claim the vault was updated.
 
+### Problem-solution project findings
+
+For `knowledge_kind: problem_solution`, follow [the governed record workflow](../../docs/problem-solutions.md)
+and its [template](assets/problem-solution-template.md). Complete the task and research-audit first.
+Validate structure and retained evidence, then stage a proposal with `scripts/problem_solution.py propose`.
+Review existing concepts for duplicates; prefer updating an existing mechanism. Regenerate the review,
+show its exact destination/diff/digest and retained evidence, and obtain the owner's direct per-package
+approval. After approval, use `apply` with that digest and the approval message reference. Verify receipt,
+MOC and actual MCP readback. A reference records authorization; it does not create it.
+
+Project findings always use interactive approval, including an existing profile touched by unattended
+synthesis: stage and report it as held for review, then continue other eligible generic concepts.
+An unanswered/declined proposal stays unsaved. The legacy concept writer refuses these profiles.
+Retain only the exact reviewed evidence package; changed bytes or bases require fresh review. Report a
+partial interrupted save honestly and recover only through the same exact approved package. A later
+reuse observation is another proposal, with its own approval; source verification dates are not reset
+by reuse or editing. The core CLI checks structure, paths and hashes, not factual correctness.
+
 ### Phase 1 — Diff
 
 (1) Read the new artifact / lesson. (2) Read `brain/INDEX.md` (the MOC) for a semantic map of the vault. (3) Extract key entities (concepts, tools, figures, sources); for a lesson — already in frontmatter (`topic_tags`, `related_concept`). (4) Match against existing concepts via keyword match on `topic_tags` + titles; a lesson with `related_concept:` → first UPDATE candidate. (5) **Cross-link presence check** (Phase 1.5): a lesson without `related_concept:`/`parent_playbook:` → `ORPHAN_RISK_HOLD` (soft-flag in Phase 2) — an orphan note has no backlinks and disappears from the graph view. (6) **Dedup search before any CREATE** (Phase 1.6, below) — run for every CREATE candidate; a clear match downgrades CREATE → UPDATE. Verdict per entity: UPDATE / CREATE / IGNORE / BACKLOG / RETIRE_LESSON / ORPHAN_RISK_HOLD. Verdict definitions + cross-link check: [`references/ingest-rules.md`](references/ingest-rules.md).

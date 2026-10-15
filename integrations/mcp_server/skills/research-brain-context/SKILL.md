@@ -17,7 +17,10 @@ substitute an invented tool result or call an approval error a vault miss.
 1. Identify the actual decision and scope. If the entity or topic is ambiguous, ask one
    targeted clarification before querying. Use a concise technical query rather than a
    generic question wrapper. Search is lexical: synonyms and translations may miss.
-2. Call `search_knowledge` with `vault_only` for an explicit vault-only question or `research`
+2. For a reusable project solution, use explicit `programming_language`, `problem_type` and/or
+   `knowledge_kind: problem_solution` filters when known. They combine with AND; use an empty query
+   with filters to browse. Values are literal metadata, not inferred from prose or translated.
+   Call `search_knowledge` with `vault_only` for an explicit vault-only question or `research`
    for a request to investigate, compare, or check current information. Preserve the returned
    note path, public source links/dates, confidence, freshness, and open questions.
 3. Call `get_concept` when the compact excerpt cannot support the requested point. Treat
@@ -34,7 +37,12 @@ substitute an invented tool result or call an approval error a vault miss.
 6. If freshness is `review_due`, `unknown`, or `unassessed`, label the limitation and define
    what needs checking. A dated rule may still be useful background; do not present it as
    freshly verified or fill unsupported gaps with assumptions.
-7. If the user wants to retain a finding, prepare a short source-linked proposal with
+7. If the user wants to retain a completed finding, follow the trusted checkout’s
+   `docs/problem-solutions.md` proposal/review/apply path for problem-solution records. Show the
+   owner the exact regenerated package and digest, then apply only after direct per-package
+   approval and record its message reference. Changed content/base needs fresh approval.
+   Check receipt, MOC and actual MCP readback before reporting a save. Otherwise prepare
+   an unsaved source-linked proposal with
    applicability and uncertainty. A completed save requires the trusted interactive
    `wiki-ingest` workflow (`INTERACTIVE=true`) and its explicit per-change approval. If that
    workflow is unavailable, return the proposal as unsaved. MCP retrieval exposes no write tool.

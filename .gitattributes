@@ -38,3 +38,7 @@ requirements-dev.txt export-ignore
 /.claude/settings.json                    export-ignore
 /.claude/agents/security-gate-reviewer.md export-ignore
 /skills/release/                          export-ignore
+
+# Private learning workflow state is never part of a user distribution.
+/pipeline/.learning/ export-ignore
+/planning/implementation/ export-ignore

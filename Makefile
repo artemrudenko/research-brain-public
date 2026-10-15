@@ -47,6 +47,7 @@ test: ## Run the test suite with coverage (the blocking CI gate)
 mcp-test: ## Check the optional MCP adapter in its isolated locked environment
 	$(UVR) --project integrations/mcp_server $(if $(MCP_PYTHON),--python $(MCP_PYTHON),) --group dev pytest integrations/mcp_server/tests -q
 	$(UVR) --project integrations/mcp_server $(if $(MCP_PYTHON),--python $(MCP_PYTHON),) python integrations/mcp_server/examples/replay.py
+	$(UVR) --project integrations/mcp_server $(if $(MCP_PYTHON),--python $(MCP_PYTHON),) python integrations/mcp_server/examples/problem_solution.py
 
 lint: ## Lint runtime, tests, and contributor tools with ruff
 	$(UVR) ruff check scripts tests tools integrations/mcp_server

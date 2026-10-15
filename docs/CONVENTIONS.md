@@ -984,3 +984,17 @@ quality, this is about "is the pipe working").
   - *digest freshness* — the age of the latest `digest_*.md`; *stale* at >8 days (a week + slack);
   - *brain health note* — one line from the latest `brain-health_*.md`.
 - **Bottom line:** `ok = True` only when there are no dead feeds, no failed delivery, and the digest is not stale.
+
+
+## Project problem-solution profile (concept schema 1)
+
+The optional `knowledge_kind: problem_solution` concept profile is defined in
+[problem-solutions.md](problem-solutions.md) and validated by
+`scripts/problem_solutions/profile.py`. It adds language/problem facets, applicability,
+verification and explicit evidence scope without changing generic concept metadata.
+A structurally valid profile may cite retained project synthesis evidence rather than an
+external URL; every key fact must still cite a declared source, and the evidence must exist.
+The hygiene pass and write-time gate share this check. Save these records only through
+interactive exact-package approval with `scripts/problem_solution.py`; unattended synthesis
+holds these changes for review. MCP filters are exact metadata matches, not an evidence
+certificate, privacy boundary or factual audit.

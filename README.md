@@ -320,3 +320,12 @@ It overlays the new code, **preserves** your vault (`brain/`), run data (`pipeli
 secrets (`config/.env`) and your customized config (`sources`/`topics`/`channels`/`tags`),
 refuses a silent downgrade, and takes a full backup first. Details and rollback:
 [`docs/updating.md`](docs/updating.md); the release history is in [`CHANGELOG.md`](CHANGELOG.md).
+
+
+### Reuse checked project solutions
+
+[Problem-solution records](docs/problem-solutions.md) retain applicability, evidence and
+limits for reuse across projects. Validate a candidate, review its exact note/evidence/MOC
+package, and save after direct owner approval. The read-only MCP adapter can filter these
+records by programming language and problem type. Private candidates and approvals stay
+outside searchable concepts and public exports.

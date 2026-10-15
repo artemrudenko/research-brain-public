@@ -92,6 +92,7 @@ from scripts.hygiene.checks import (  # noqa: E402
     check_orphan,
     check_pending_cap,
     check_playbook_navigation,
+    check_problem_solution,
     check_stale,
     check_tags,
     gate_concepts,
@@ -253,6 +254,7 @@ def validate_brain(root: Path = PROJECT_ROOT, *, today: date | None = None) -> B
         if missing:
             warnings.append(missing)
         warnings.extend(check_keyfacts_citation(concept))
+        warnings.extend(check_problem_solution(concept))
         stale = check_stale(concept, today=today)
         if stale:
             warnings.append(stale)

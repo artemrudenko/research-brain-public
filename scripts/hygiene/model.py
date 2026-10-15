@@ -1,6 +1,7 @@
 """Result types of the brain-hygiene pass: the parsed note, one finding, and
 the assembled health of the whole vault. Pure data — no filesystem access.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -105,6 +106,10 @@ class BrainHealth:
         return self._count("tag")
 
     @property
+    def problem_solution_findings(self) -> int:
+        return self._count("problem-solution")
+
+    @property
     def headline(self) -> str:
         """The human-readable one-line health string (CONVENTIONS §13)."""
         return (
@@ -112,6 +117,11 @@ class BrainHealth:
             f"{self.orphans} orphans, {self.broken_links} broken links, "
             f"{self.missing_sources} missing-sources, "
             f"{self.uncited_facts} uncited-facts, {self.stale} stale"
+            + (
+                f", {self.problem_solution_findings} problem-solution findings"
+                if self.problem_solution_findings
+                else ""
+            )
         )
 
     @property
@@ -125,4 +135,9 @@ class BrainHealth:
             f"Health: {self.concept_count} concepts · {self.orphans} orphans · "
             f"{self.broken_links} broken links · {self.missing_sources} "
             f"missing-sources · {self.uncited_facts} uncited-facts · {self.stale} stale"
+            + (
+                f" · {self.problem_solution_findings} problem-solution findings"
+                if self.problem_solution_findings
+                else ""
+            )
         )

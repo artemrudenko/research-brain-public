@@ -6,6 +6,13 @@ final verification and pilot review. The current source is a release candidate.
 
 ## [Unreleased]
 
+### Added
+
+- Validated problem-solution concept records, explicit language/problem-type MCP filters,
+  and private exact-digest project proposals with interactive owner approval, stale-base
+  checks, retained evidence, atomic readback and resumable interrupted saves. MCP stays
+  read-only; profile problems appear in vault health reports.
+
 ### Included in the 0.1.0 candidate
 
 - Topic and source configuration, RSS-first collection, sanitization, curation,

@@ -5,7 +5,9 @@ tools_forbidden: [WebFetch]
 permissions:
   - read: pipeline/, brain/, templates/, docs/
   - write: brain/concepts/, brain/lessons/ (status updates only), brain/INDEX.md
-  - no_write: archive/, pipeline/ (read-only — source artifacts incl. pipeline/0-archive/ verbatim copies)
+  - write: pipeline/.learning/ (private candidates and approval receipts)
+  - write: pipeline/0-archive/, pipeline/3-synthesis/ (only declared evidence in an exact owner-approved problem_solution.py package)
+  - no_write: archive/, other pipeline files (read-only)
 limits:
   max_files_per_run: 20
   max_subagents: 0
